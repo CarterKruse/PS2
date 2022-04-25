@@ -8,7 +8,7 @@ import java.util.List;
  * @author Chris Bailey-Kellogg, Dartmouth CS 10, Spring 2015
  * @author CBK, Spring 2016, Explicit Rectangle
  * @author CBK, Fall 2016, Generic With Point2D Interface
- * @author Carter Kruse, Dartmouth CS 10, Spring 2022
+ * @author Carter Kruse & John Deforest, Dartmouth CS 10, Spring 2022
  */
 public class PointQuadtree<E extends Point2D>
 {
@@ -18,6 +18,8 @@ public class PointQuadtree<E extends Point2D>
     private PointQuadtree<E> c1, c2, c3, c4; // Children
 
     /**
+     * Constructor
+     *
      * Initializes a leaf quadtree, holding the point in the rectangle.
      */
     public PointQuadtree(E point, int x1, int y1, int x2, int y2)
@@ -77,145 +79,208 @@ public class PointQuadtree<E extends Point2D>
 
     /**
      * Inserts the point into the tree.
+     *
+     * Edge Cases: In situations where the point is at the same x- or y-coordinate as a parent,
+     * the quadrant with the lowest number (1-4) is selected for the child.
      */
     public void insert(E point2)
     {
-        if (point2.getX() > this.point.getX() && point2.getY() < this.point.getY())
+        // Checking to ensure the point is not placed in the same location as the original.
+        if (point2.getX() == this.point.getX() && point2.getY() == this.point.getY())
         {
+            this.point = point2; // Replacing the original point.
+        }
+
+        // Checking to see if the point location is in the first quadrant.
+        else if (point2.getX() >= this.point.getX() && point2.getY() <= this.point.getY())
+        {
+            // If the first quadrant already has a child, recursively add the point.
             if (this.hasChild(1))
             {
-                c1.insert(point2);
+                this.c1.insert(point2);
             }
 
+            // Otherwise, create a new PointQuadTree with the appropriate node and bounds for the rectangle.
             else
             {
-                this.c1 = new PointQuadtree<E>(point2, (int) this.point.getX(), this.y1, this.x2, (int) this.point.getY());
+                this.c1 = new PointQuadtree<>(point2, (int) this.point.getX(), this.y1, this.x2, (int) this.point.getY());
             }
         }
 
-        else if (point2.getX() < this.point.getX() && point2.getY() < this.point.getY())
+        // Checking to see if the point location is in the second quadrant.
+        else if (point2.getX() <= this.point.getX() && point2.getY() <= this.point.getY())
         {
+            // If the second quadrant already has a child, recursively add the point.
             if (this.hasChild(2))
             {
-                c2.insert(point2);
+                this.c2.insert(point2);
             }
 
+            // Otherwise, create a new PointQuadTree with the appropriate node and bounds for the rectangle.
             else
             {
-                this.c2 = new PointQuadtree<E>(point2, this.x1, this.y1, (int) this.point.getX(), (int) this.point.getY());
+                this.c2 = new PointQuadtree<>(point2, this.x1, this.y1, (int) this.point.getX(), (int) this.point.getY());
             }
         }
 
-        else if (point2.getX() < this.point.getX() && point2.getY() > this.point.getY())
+        // Checking to see if the point location is in the third quadrant.
+        else if (point2.getX() <= this.point.getX() && point2.getY() >= this.point.getY())
         {
+            // If the third quadrant already has a child, recursively add the point.
             if (this.hasChild(3))
             {
-                c3.insert(point2);
+                this.c3.insert(point2);
             }
 
+            // Otherwise, create a new PointQuadTree with the appropriate node and bounds for the rectangle.
             else
             {
-                this.c3 = new PointQuadtree<E>(point2, this.x1, (int) this.point.getY(), (int) this.point.getX(), this.y2);
+                this.c3 = new PointQuadtree<>(point2, this.x1, (int) this.point.getY(), (int) this.point.getX(), this.y2);
             }
         }
 
-        else if (point2.getX() > this.point.getX() && point2.getY() > this.point.getY())
+        // Checking to see if the point location is in the fourth quadrant.
+        else if (point2.getX() >= this.point.getX() && point2.getY() >= this.point.getY())
         {
+            // If the fourth quadrant already has a child, recursively add the point.
             if (this.hasChild(4))
             {
-                c4.insert(point2);
+                this.c4.insert(point2);
             }
 
+            // Otherwise, create a new PointQuadTree with the appropriate node and bounds for the rectangle.
             else
             {
-                this.c4 = new PointQuadtree<E>(point2, (int) this.point.getX(), (int) this.point.getY(), this.x2, this.y2);
+                this.c4 = new PointQuadtree<>(point2, (int) this.point.getX(), (int) this.point.getY(), this.x2, this.y2);
             }
         }
     }
 
     /**
-     * Finds the number of points in the quadtree (including its descendants)
+     * Finds the number of points in the quadtree (including its descendants).
      */
     public int size()
     {
+        // The count starts at one, as we consider the node of the quadtree.
         int count = 1;
 
-        if (hasChild(1)) count += this.c1.size();
-        if (hasChild(2)) count += this.c2.size();
-        if (hasChild(3)) count += this.c3.size();
-        if (hasChild(4)) count += this.c4.size();
+        // Checking through each quadrant for children and recursively returning the size.
+        if (this.hasChild(1)) count += this.c1.size();
+        if (this.hasChild(2)) count += this.c2.size();
+        if (this.hasChild(3)) count += this.c3.size();
+        if (this.hasChild(4)) count += this.c4.size();
 
         return count;
     }
 
     /**
-     * Builds a list of all the points in the quadtree (including its descendants)
+     * Builds a list of all the points in the quadtree (including its descendants).
+     *
+     * @return The points in the quadtree.
      */
-//    public List<E> allPoints()
-//    {
-//        ArrayList<E> listOfPoints = new ArrayList<E>();
-//
-//        if (this.hasChild())
-//
-//        if (this.hasChild(1))
-//        {
-//            //listOfPoints.add();
-//        }
-//
-//        if (this.hasChild(2))
-//        {
-//
-//        }
-//        if (this.hasChild(3))
-//        {
-//
-//        }
-//        if (this.hasChild(4))
-//        {
-//
-//        }
-//
-//        // TODO: YOUR CODE HERE
-//    }
-
-    @Override
-    public String toString()
+    public List<E> allPoints()
     {
-        return "" + point.getX() + " " + point.getY() + " " + x1 + " " + y1 + " " + x2 + " " + y2 + " ";
+        // Initializing the list of points in the quadtree.
+        List<E> pointsList = new ArrayList<>();
+
+        // Helper method adds each point in the quadtree to the list, recursively.
+        addPoints(pointsList);
+        return pointsList;
     }
 
     /**
-     * Uses the quadtree to find all points within the circle
+     * Uses the quadtree to find all points within the circle.
      *
-//     * @param cx circle center x
-//     * @param cy circle center y
-//     * @param cr circle radius
-     * @return the points in the circle (and the qt's rectangle)
+     * @param cx Circle center x.
+     * @param cy Circle center y.
+     * @param cr Circle radius.
+     *
+     * @return The points in the circle.
      */
-//    public List<E> findInCircle(double cx, double cy, double cr)
-//    {
-//        // TODO: YOUR CODE HERE
-//    }
-
-    // TODO: YOUR CODE HERE for any helper methods
-    public static void main(String[] args)
+    public List<E> findInCircle(double cx, double cy, double cr)
     {
-        PointQuadtree<Blob> bob = new PointQuadtree<Blob>(new Blob(50,50), 0, 0, 100, 100);
+        // Initializing the list of the points in the circle.
+        List<E> pointsInCircle = new ArrayList<>();
 
-        bob.insert(new Blob(70, 40));
+        // Helper method adds each point in the circle to the list, recursively.
+        addPointsInCircle(pointsInCircle, cx, cy, cr);
+        return pointsInCircle;
+    }
 
-        bob.insert(new Blob(80, 30));
+    // Helper Methods
 
-        bob.insert(new Blob(20, 30));
-        bob.insert(new Blob(30, 40));
+    /**
+     * Accumulator -> Adds all points in the quadtree to a list, recursively.
+     *
+     * @param pointsList The list of points to consider when adding points to the list of all points.
+     */
+    public void addPoints(List<E> pointsList)
+    {
+        // Start by adding the point which is the node.
+        pointsList.add(this.point);
 
-        System.out.println(bob.size());
+        // Recursively pass the points which are the children of the node to the method.
+        if (this.hasChild(1))
+        {
+            this.c1.addPoints(pointsList);
+        }
 
-        System.out.println(bob);
-        System.out.println(bob.c1);
-        System.out.println(bob.c1.c1);
-        System.out.println(bob.c2);
-        System.out.println(bob.c2.c4);
-        System.out.println(bob.c2.c3);
+        if (this.hasChild(2))
+        {
+            this.c2.addPoints(pointsList);
+        }
+
+        if (this.hasChild(3))
+        {
+            this.c3.addPoints(pointsList);
+        }
+
+        if (this.hasChild(4))
+        {
+            this.c4.addPoints(pointsList);
+        }
+    }
+
+    /**
+     * Accumulator -> Adds all points in the circle to a list, recursively.
+     *
+     * @param pointsInCircleList The list of points to consider when adding points to the list.
+     * @param cx The x-coordinate of the center of the circle.
+     * @param cy The y-coordinate of the center of the circle.
+     * @param cr The radius of the circle.
+     */
+    public void addPointsInCircle(List<E> pointsInCircleList, double cx, double cy, double cr)
+    {
+        // Using the Geometry helper method to determine if the circle intersects a given quadrant.
+        if (Geometry.circleIntersectsRectangle(cx, cy, cr, this.x1, this.y1, this.x2, this.y2))
+        {
+            // Using the Geometry helper method to determine if the point is within the circle.
+            if (Geometry.pointInCircle(this.point.getX(), this.point.getY(), cx, cy, cr))
+            {
+                // Adding the point which is within the circle.
+                pointsInCircleList.add(this.point);
+            }
+
+            // Recursively pass the points which are the children of the node to the method.
+            if (hasChild(1))
+            {
+                this.c1.addPointsInCircle(pointsInCircleList, cx, cy, cr);
+            }
+
+            if (hasChild(2))
+            {
+                this.c2.addPointsInCircle(pointsInCircleList, cx, cy, cr);
+            }
+
+            if (hasChild(3))
+            {
+                this.c3.addPointsInCircle(pointsInCircleList, cx, cy, cr);
+            }
+
+            if (hasChild(4))
+            {
+                this.c4.addPointsInCircle(pointsInCircleList, cx, cy, cr);
+            }
+        }
     }
 }

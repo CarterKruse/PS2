@@ -6,7 +6,7 @@ import java.awt.Graphics;
  *
  * @author Chris Bailey-Kellogg, Dartmouth CS 10, Spring 2016
  * @author CBK, Fall 2016, Implements Point2D
- * @author Carter Kruse, Dartmouth CS 10, Spring 2022
+ * @author Carter Kruse & John Deforest, Dartmouth CS 10, Spring 2022
  */
 
 public class Blob implements Point2D
@@ -47,6 +47,8 @@ public class Blob implements Point2D
         this.y = y;
         this.r = r;
     }
+
+    // Getters & Setters
 
     public double getX()
     {

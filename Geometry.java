@@ -3,7 +3,7 @@
  *
  * @author Chris Bailey-Kellogg, Dartmouth CS 10, Spring 2015
  * @author CBK, Fall 2016 (Separated from Quadtree. Instrumented to count calls.)
- * @author Carter Kruse, Dartmouth CS 10, Spring 2022
+ * @author Carter Kruse & John Deforest, Dartmouth CS 10, Spring 2022
  */
 public class Geometry
 {
