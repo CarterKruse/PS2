@@ -132,47 +132,58 @@ public class CollisionGUI extends DrawingGUI
 
     /**
      * Sets colliders to include all blobs in contact with another blob.
-     *
-     * STILL TO DO -
      */
     private void findColliders()
     {
         // Creating an empty tree. The node will initialize the tree.
         PointQuadtree<Blob> treeOfBlobs = null;
 
-        // Populating the tree with all of the blobs.
-        for (Blob blob : blobs)
+        // Filling the PointQuadtree with all the blobs.
+
+        // Checking to make sure the list of blobs is not null.
+        if (this.blobs != null)
         {
-            if (treeOfBlobs == null)
+            // Cycling through all the blobs in the list.
+            for (Blob blob : this.blobs)
             {
-                treeOfBlobs = new PointQuadtree<Blob>(blob, 0, 0, width, height);
-            }
-            else
-            {
-                treeOfBlobs.insert(blob);
+                // If the PointQuadtree does not have any blobs, then create a new PointQuadtree with the node.
+                if (treeOfBlobs == null)
+                {
+                    treeOfBlobs = new PointQuadtree<Blob>(blob, 0, 0, width, height);
+                }
+
+                // Otherwise, insert the blob into the PointQuadtree.
+                else
+                {
+                    treeOfBlobs.insert(blob);
+                }
             }
         }
-        // Finding/identifying the colliders
+
+        // Identifying the colliders based on the findInCircle() method.
+
+        // Checking to ensure that the PointQuadtree is not null.
         if (treeOfBlobs != null)
         {
+            // If the list of colliders is null, then we create a new ArrayList of type Blob.
             if (colliders == null)
             {
                 colliders = new ArrayList<Blob>();
             }
 
+            // Cycling through all the blobs in the list.
             for (Blob blob : blobs)
             {
+                /* For each blob, we check to see if any other blob collided with it.
+                The value of 1 is used, as we already know the initial blob is in the circle.
+                We use 2 * [radius], as this detects a collision on the edges of the blobs.
+                 */
                 if (treeOfBlobs.findInCircle(blob.x, blob.y, blob.r * 2).size() > 1)
                 {
-                    colliders.add(blob);
+                    colliders.add(blob); // If so, we add this blob to the list of colliders.
                 }
             }
         }
-
-
-        // TODO
-        // Create the tree
-        // For each blob, see if anybody else collided with it
     }
 
     /**
