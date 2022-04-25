@@ -3,7 +3,7 @@
  * Called it a "Dot" to distinguish from Point.
  *
  * @author Chris Bailey-Kellogg, Dartmouth CS 10, Fall 2016
- * @author Carter Kruse, Dartmouth CS 10, Spring 2022
+ * @author Carter Kruse & John Deforest, Dartmouth CS 10, Spring 2022
  */
 public class Dot implements Point2D
 {
