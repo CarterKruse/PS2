@@ -59,23 +59,36 @@ public class DotTreeGUI extends DrawingGUI
     {
         if (mode == 'a')
         {
-            Dot newDot = new Dot(x, y);
-
-            if (tree == null)
+            // If the PointQuadtree is not null, we add a dot to the PointQuadtree.
+            if (tree != null)
             {
-                tree = new PointQuadtree<>(newDot, 0, 0, width, height);
+                tree.insert(new Dot(x, y));
             }
 
-            tree.insert(newDot);
-            // Add a new dot at the point
-            // TODO: YOUR CODE HERE
+            //  If the PointQuadtree does not exist (is null), we initialize a new PointQuadtree using the dot.
+            else
+            {
+                tree = new PointQuadtree<>(new Dot(x, y), 0, 0, width, height);
+            }
         }
 
         else if (mode == 'q')
         {
-            found = tree.findInCircle(x, y, mouseRadius);
-            // Set "found" to what tree says is near the mouse press
-            // TODO: YOUR CODE HERE
+            // If the list found it null, we initialize a new ArrayList.
+            if (found == null)
+            {
+                found = new ArrayList<Dot>();
+            }
+
+            else
+            {
+                // Checking to make sure the PointQuadtree is not equal to null.
+                if (tree != null)
+                {
+                    // Setting found to what the tree says is near the mouse press.
+                    found = tree.findInCircle(x, y, mouseRadius);
+                }
+            }
         }
 
         else
@@ -172,94 +185,112 @@ public class DotTreeGUI extends DrawingGUI
     }
 
     /**
-     * DrawingGUI method, here toggling the mode between 'a' and 'q'
-     * and increasing/decresing mouseRadius via +/-
+     * DrawingGUI Method -> Here toggling the mode between 'a' and 'q' and increasing/decreasing mouseRadius via +/-.
      */
     @Override
     public void handleKeyPress(char key)
     {
         if (key == 'a' || key == 'q') mode = key;
+
         else if (key == '+')
         {
             mouseRadius += 10;
         }
+
         else if (key == '-')
         {
             mouseRadius -= 10;
             if (mouseRadius < 0) mouseRadius = 0;
         }
+
         else if (key == 'm')
         {
             trackMouse = !trackMouse;
         }
+
         else if (key == '0')
         {
             test0();
         }
+
         else if (key == '1')
         {
             test1();
         }
-        // TODO: YOUR CODE HERE -- your test cases
+
+        // TODO: your test cases
 
         repaint();
     }
 
     /**
-     * DrawingGUI method, here drawing the quadtree
-     * and if in query mode, the mouse location and any found dots
+     * DrawingGUI Method -> Here drawing the quadtree and if in query mode, the mouse location and any found dots.
      */
     @Override
     public void draw(Graphics g)
     {
+        // Drawing the PointQuadtree if it is not null.
         if (tree != null) drawTree(g, tree, 0);
+
+        // If we are querying with the mouse...
         if (mode == 'q')
         {
+            // Setting the color of the graphics to black and displaying the circle around the mouse.
             g.setColor(Color.BLACK);
             g.drawOval(mouseX - mouseRadius, mouseY - mouseRadius, 2 * mouseRadius, 2 * mouseRadius);
+
+            // Checking to make sure found it not equal to null.
             if (found != null)
             {
+                // Setting the color of the graphics to black.
                 g.setColor(Color.BLACK);
-                for (Dot d : found)
+
+                // Cycling through the dots in the list of "found" points.
+                for (Dot dot : found)
                 {
-                    g.fillOval((int) d.getX() - dotRadius, (int) d.getY() - dotRadius, 2 * dotRadius, 2 * dotRadius);
+                    g.fillOval((int) dot.getX() - dotRadius, (int) dot.getY() - dotRadius, 2 * dotRadius, 2 * dotRadius);
                 }
             }
         }
     }
 
     /**
-     * Draws the dot tree
+     * Draws the dot tree.
      *
-     * @param g     the graphics object for drawing
-     * @param tree  a dot tree (not necessarily root)
-     * @param level how far down from the root qt is (0 for root, 1 for its children, etc.)
+     * @param g The graphics object for drawing.
+     * @param tree A dot tree (not necessarily root).
+     * @param level How far down from the root qt is (0 for root, 1 for its children, etc.)
      */
     public void drawTree(Graphics g, PointQuadtree<Dot> tree, int level)
     {
-        // Set the color for this level
+        // Setting the color for this level, using a modulus function.
         g.setColor(rainbow[level % rainbow.length]);
 
-        // Draw this node's dot and lines through it
+        // Drawing the node's dot.
         g.fillOval((int) tree.getPoint().getX() - dotRadius, (int) tree.getPoint().getY() - dotRadius, dotRadius * 2, dotRadius * 2);
+
+        // Drawing the horizontal line.
         g.drawLine(tree.getX1(), (int) tree.getPoint().getY(), tree.getX2(), (int) tree.getPoint().getY());
+
+        // Drawing the vertical line.
         g.drawLine((int) tree.getPoint().getX(), tree.getY1(), (int) tree.getPoint().getX(), tree.getY2());
 
-        // Recurse with children
-        // TODO: YOUR CODE HERE
-
+        // Recurse with the children of the parent node. Drawing all the descendants of the node.
         if (tree.hasChild(1))
         {
             drawTree(g, tree.getChild(1), level + 1);
         }
+
         if (tree.hasChild(2))
         {
             drawTree(g, tree.getChild(2), level + 1);
         }
+
         if (tree.hasChild(3))
         {
             drawTree(g, tree.getChild(3), level + 1);
         }
+
         if (tree.hasChild(4))
         {
             drawTree(g, tree.getChild(4), level + 1);
