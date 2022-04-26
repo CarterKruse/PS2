@@ -1,18 +1,19 @@
+import javax.swing.*;
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
-import javax.swing.*;
 
 /**
  * Driver (Interacting With A Quadtree)
  * Inserting points, viewing the tree, and finding points near a mouse press.
+ * Extra Credit Version (Implementation of findInRectangle).
  *
  * @author Chris Bailey-Kellogg, Dartmouth CS 10, Spring 2015
  * @author CBK, Spring 2016
  * @author CBK, Fall 2016
  * @author Carter Kruse & John Deforest, Dartmouth CS 10, Spring 2022
  */
-public class DotTreeGUI extends DrawingGUI
+public class DotTreeGUIExtra extends DrawingGUI
 {
     private static final int width = 800, height = 600; // Size of the universe.
     private static final int dotRadius = 5; // To draw a dot, so it is visible.
@@ -20,14 +21,14 @@ public class DotTreeGUI extends DrawingGUI
     // To color the different levels differently.
     private static final Color[] rainbow = {Color.RED, Color.ORANGE, Color.YELLOW, Color.GREEN, Color.BLUE, Color.MAGENTA};
 
-    private PointQuadtree<Dot> tree = null; // Holds the dots.
-    private char mode = 'a'; // 'a': Adding; 'q': Querying with the mouse.
+    private PointQuadtreeExtra<Dot> tree = null; // Holds the dots.
+    private char mode = 'a'; // 'a': Adding; 'q': Querying with the mouse. 'k': Querying with the mouse, rectangle mode.
     private int mouseX, mouseY; // Current mouse location (when querying).
     private int mouseRadius = 10; // Circle around mouse location (for querying).
     private boolean trackMouse = false; // If true, then print out where the mouse is as it moves.
     private List<Dot> found = null; // List of dots near the mouse when querying.
 
-    public DotTreeGUI()
+    public DotTreeGUIExtra()
     {
         super("Dot Tree", width, height);
     }
@@ -38,7 +39,7 @@ public class DotTreeGUI extends DrawingGUI
     @Override
     public void handleMouseMotion(int x, int y)
     {
-        if (mode == 'q')
+        if (mode == 'q' || mode == 'k')
         {
             mouseX = x;
             mouseY = y;
@@ -68,7 +69,7 @@ public class DotTreeGUI extends DrawingGUI
             //  If the PointQuadtree does not exist (is null), we initialize a new PointQuadtree using the dot.
             else
             {
-                tree = new PointQuadtree<>(new Dot(x, y), 0, 0, width, height);
+                tree = new PointQuadtreeExtra<>(new Dot(x, y), 0, 0, width, height);
             }
         }
 
@@ -87,6 +88,25 @@ public class DotTreeGUI extends DrawingGUI
                 {
                     // Setting found to what the tree says is near the mouse press.
                     found = tree.findInCircle(x, y, mouseRadius);
+                }
+            }
+        }
+
+        else if (mode == 'k')
+        {
+            // If the list found it null, we initialize a new ArrayList.
+            if (found == null)
+            {
+                found = new ArrayList<Dot>();
+            }
+
+            else
+            {
+                // Checking to make sure the PointQuadtree is not equal to null.
+                if (tree != null)
+                {
+                    // Setting found to what the tree says is near the mouse press.
+                    found = tree.findInRectangle(x - mouseRadius, y - mouseRadius, x + mouseRadius, y + mouseRadius);
                 }
             }
         }
@@ -153,7 +173,7 @@ public class DotTreeGUI extends DrawingGUI
     private void test0()
     {
         found = null;
-        tree = new PointQuadtree<Dot>(new Dot(400, 300), 0, 0, 800, 600); // Start with A.
+        tree = new PointQuadtreeExtra<Dot>(new Dot(400, 300), 0, 0, 800, 600); // Start with A.
         tree.insert(new Dot(150, 450)); // B
         tree.insert(new Dot(250, 550)); // C
 
@@ -176,7 +196,7 @@ public class DotTreeGUI extends DrawingGUI
     private void test1()
     {
         found = null;
-        tree = new PointQuadtree<Dot>(new Dot(300, 400), 0, 0, 800, 600); // Start with A
+        tree = new PointQuadtreeExtra<Dot>(new Dot(300, 400), 0, 0, 800, 600); // Start with A
         tree.insert(new Dot(150, 450)); // B
         tree.insert(new Dot(250, 550)); // C
         tree.insert(new Dot(450, 200)); // D
@@ -202,7 +222,7 @@ public class DotTreeGUI extends DrawingGUI
     private void test2()
     {
         found = null;
-        tree = new PointQuadtree<Dot>(new Dot(100, 500), 0, 0, width, height); // start with A
+        tree = new PointQuadtreeExtra<Dot>(new Dot(100, 500), 0, 0, width, height); // start with A
         tree.insert(new Dot(300, 400)); // B
         tree.insert(new Dot(400, 300)); // C
         tree.insert(new Dot(600, 200)); // D
@@ -226,7 +246,7 @@ public class DotTreeGUI extends DrawingGUI
     @Override
     public void handleKeyPress(char key)
     {
-        if (key == 'a' || key == 'q') mode = key;
+        if (key == 'a' || key == 'q' || key == 'k') mode = key;
 
         else if (key == '+')
         {
@@ -291,6 +311,26 @@ public class DotTreeGUI extends DrawingGUI
                 }
             }
         }
+
+        if (mode == 'k')
+        {
+            // Setting the color of the graphics to black and displaying the circle around the mouse.
+            g.setColor(Color.BLACK);
+            g.drawRect(mouseX - mouseRadius, mouseY - mouseRadius, mouseRadius * 2 , mouseRadius * 2);
+
+            // Checking to make sure found it not equal to null.
+            if (found != null)
+            {
+                // Setting the color of the graphics to black.
+                g.setColor(Color.BLACK);
+
+                // Cycling through the dots in the list of "found" points.
+                for (Dot dot : found)
+                {
+                    g.fillOval((int) dot.getX() - dotRadius, (int) dot.getY() - dotRadius, 2 * dotRadius, 2 * dotRadius);
+                }
+            }
+        }
     }
 
     /**
@@ -300,7 +340,7 @@ public class DotTreeGUI extends DrawingGUI
      * @param tree A dot tree (not necessarily root).
      * @param level How far down from the root qt is (0 for root, 1 for its children, etc.)
      */
-    public void drawTree(Graphics g, PointQuadtree<Dot> tree, int level)
+    public void drawTree(Graphics g, PointQuadtreeExtra<Dot> tree, int level)
     {
         // Setting the color for this level, using a modulus function.
         g.setColor(rainbow[level % rainbow.length]);
@@ -342,7 +382,7 @@ public class DotTreeGUI extends DrawingGUI
         {
             public void run()
             {
-                new DotTreeGUI();
+                new DotTreeGUIExtra();
             }
         });
     }
