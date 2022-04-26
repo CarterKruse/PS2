@@ -200,6 +200,9 @@ public class CollisionGUI extends DrawingGUI
         // Check for collisions.
         if (blobs.size() > 0)
         {
+            // Ensuring that the colliders do not remain red after the collision has occurred.
+            colliders = null;
+
             findColliders();
 
             // Checking to see whether to destroy (d) the colliders.
