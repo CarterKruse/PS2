@@ -1,10 +1,11 @@
 import java.awt.*;
+import java.util.ArrayList;
 import java.util.List;
 import javax.swing.*;
 
 /**
- * Driver for interacting with a quadtree:
- * inserting points, viewing the tree, and finding points near a mouse press
+ * Driver (Interacting With A Quadtree)
+ * Inserting points, viewing the tree, and finding points near a mouse press.
  *
  * @author Chris Bailey-Kellogg, Dartmouth CS 10, Spring 2015
  * @author CBK, Spring 2016
@@ -13,25 +14,26 @@ import javax.swing.*;
  */
 public class DotTreeGUI extends DrawingGUI
 {
-    private static final int width = 800, height = 600;        // size of the universe
-    private static final int dotRadius = 5;                // to draw dot, so it's visible
-    private static final Color[] rainbow = {Color.RED, Color.ORANGE, Color.YELLOW, Color.GREEN, Color.BLUE, Color.MAGENTA};
-    // to color different levels differently
+    private static final int width = 800, height = 600; // Size of the universe.
+    private static final int dotRadius = 5; // To draw a dot, so it is visible.
 
-    private PointQuadtree<Dot> tree = null;            // holds the dots
-    private char mode = 'a';                        // 'a': adding; 'q': querying with the mouse
-    private int mouseX, mouseY;                        // current mouse location, when querying
-    private int mouseRadius = 10;                    // circle around mouse location, for querying
-    private boolean trackMouse = false;                // if true, then print out where the mouse is as it moves
-    private List<Dot> found = null;                    // who was found near mouse, when querying
+    // To color the different levels differently.
+    private static final Color[] rainbow = {Color.RED, Color.ORANGE, Color.YELLOW, Color.GREEN, Color.BLUE, Color.MAGENTA};
+
+    private PointQuadtree<Dot> tree = null; // Holds the dots.
+    private char mode = 'a'; // 'a': Adding; 'q': Querying with the mouse.
+    private int mouseX, mouseY; // Current mouse location (when querying).
+    private int mouseRadius = 10; // Circle around mouse location (for querying).
+    private boolean trackMouse = false; // If true, then print out where the mouse is as it moves.
+    private List<Dot> found = null; // List of dots near the mouse when querying.
 
     public DotTreeGUI()
     {
-        super("dottree", width, height);
+        super("Dot Tree", width, height);
     }
 
     /**
-     * DrawingGUI method, here keeping track of the location and redrawing to show it
+     * DrawingGUI Method -> Here keeping track of the location and redrawing to show it.
      */
     @Override
     public void handleMouseMotion(int x, int y)
@@ -42,32 +44,45 @@ public class DotTreeGUI extends DrawingGUI
             mouseY = y;
             repaint();
         }
+
         if (trackMouse)
         {
-            System.out.println(x + "," + y);
+            System.out.println(x + ", " + y);
         }
     }
 
     /**
-     * DrawingGUI method, here either adding a new point or querying near the mouse
+     * DrawingGUI Method -> Here either adding a new point or querying near the mouse.
      */
     @Override
     public void handleMousePress(int x, int y)
     {
         if (mode == 'a')
         {
+            Dot newDot = new Dot(x, y);
+
+            if (tree == null)
+            {
+                tree = new PointQuadtree<>(newDot, 0, 0, width, height);
+            }
+
+            tree.insert(newDot);
             // Add a new dot at the point
             // TODO: YOUR CODE HERE
         }
+
         else if (mode == 'q')
         {
+            found = tree.findInCircle(x, y, mouseRadius);
             // Set "found" to what tree says is near the mouse press
             // TODO: YOUR CODE HERE
         }
+
         else
         {
-            System.out.println("clicked at " + x + "," + y);
+            System.out.println("Clicked At: " + x + ", " + y);
         }
+
         repaint();
     }
 
@@ -224,11 +239,31 @@ public class DotTreeGUI extends DrawingGUI
     {
         // Set the color for this level
         g.setColor(rainbow[level % rainbow.length]);
+
         // Draw this node's dot and lines through it
-        // TODO: YOUR CODE HERE
+        g.fillOval((int) tree.getPoint().getX() - dotRadius, (int) tree.getPoint().getY() - dotRadius, dotRadius * 2, dotRadius * 2);
+        g.drawLine(tree.getX1(), (int) tree.getPoint().getY(), tree.getX2(), (int) tree.getPoint().getY());
+        g.drawLine((int) tree.getPoint().getX(), tree.getY1(), (int) tree.getPoint().getX(), tree.getY2());
 
         // Recurse with children
         // TODO: YOUR CODE HERE
+
+        if (tree.hasChild(1))
+        {
+            drawTree(g, tree.getChild(1), level + 1);
+        }
+        if (tree.hasChild(2))
+        {
+            drawTree(g, tree.getChild(2), level + 1);
+        }
+        if (tree.hasChild(3))
+        {
+            drawTree(g, tree.getChild(3), level + 1);
+        }
+        if (tree.hasChild(4))
+        {
+            drawTree(g, tree.getChild(4), level + 1);
+        }
     }
 
     public static void main(String[] args)
