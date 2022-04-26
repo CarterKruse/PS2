@@ -100,70 +100,83 @@ public class DotTreeGUI extends DrawingGUI
     }
 
     /**
-     * A simple testing procedure, making sure actual is expected, and printing a message if not
+     * A simple testing procedure, making sure actual is expected, and printing a message if not.
      *
-     * @param x                       query x coordinate
-     * @param y                       query y coordinate
-     * @param r                       query circle radius
-     * @param expectedCircleRectangle how many times Geometry.circleIntersectsRectangle is expected to be called
-     * @param expectedInCircle        how many times Geometry.pointInCircle is expected to be called
-     * @param expectedHits            how many points are expected to be found
+     * @param x Query x coordinate.
+     * @param y Query y coordinate.
+     * @param r Query circle radius.
+     * @param expectedCircleRectangle How many times Geometry.circleIntersectsRectangle is expected to be called.
+     * @param expectedInCircle How many times Geometry.pointInCircle is expected to be called.
+     * @param expectedHits How many points are expected to be found.
      * @return 0 if passed; 1 if failed
      */
     private int testFind(int x, int y, int r, int expectedCircleRectangle, int expectedInCircle, int expectedHits)
     {
+        // Resetting the counter functions for the static Geometry methods.
         Geometry.resetNumInCircleTests();
         Geometry.resetNumCircleRectangleTests();
+
+        // Creating new variables for the number of errors and the size of the found points.
         int errs = 0;
         int num = tree.findInCircle(x, y, r).size();
-        String which = "(" + x + "," + y + ")@" + r;
+
+        String which = "(" + x + ", " + y + ")@" + r;
+
+        // Checking to see if the number of times Geometry.circleIntersectsRectangle is expected to be called matches.
         if (Geometry.getNumCircleRectangleTests() != expectedCircleRectangle)
         {
-            errs++;
-            System.err.println(which + ": wrong # circle-rectangle, got " + Geometry.getNumCircleRectangleTests() + " but expected " + expectedCircleRectangle);
+            errs += 1;
+            System.err.println(which + ": Wrong # Circle-Rectangle, Got " + Geometry.getNumCircleRectangleTests() + " but expected " + expectedCircleRectangle);
         }
+
+        // Checking to see if the number of times Geometry.pointInCircle is expected to be called matches.
         if (Geometry.getNumInCircleTests() != expectedInCircle)
         {
-            errs++;
-            System.err.println(which + ": wrong # in circle, got " + Geometry.getNumInCircleTests() + " but expected " + expectedInCircle);
+            errs += 1;
+            System.err.println(which + ": Wrong # In Circle, Got " + Geometry.getNumInCircleTests() + " but expected " + expectedInCircle);
         }
+
+        // Checking to see if the number of points are expected to be found matches.
         if (num != expectedHits)
         {
-            errs++;
-            System.err.println(which + ": wrong # hits, got " + num + " but expected " + expectedHits);
+            errs += 1;
+            System.err.println(which + ": Wrong # Hits, Got " + num + " but expected " + expectedHits);
         }
+
         return errs;
     }
 
     /**
-     * test tree 0 -- first three points from figure in handout
-     * hardcoded point locations for 800x600
+     * Test Tree 0 -> First three points from figure in handout.
+     * Hardcoded point locations for 800x600.
      */
     private void test0()
     {
         found = null;
-        tree = new PointQuadtree<Dot>(new Dot(400, 300), 0, 0, 800, 600); // start with A
+        tree = new PointQuadtree<Dot>(new Dot(400, 300), 0, 0, 800, 600); // Start with A.
         tree.insert(new Dot(150, 450)); // B
         tree.insert(new Dot(250, 550)); // C
+
         int bad = 0;
-        bad += testFind(0, 0, 900, 3, 3, 3);        // rect for all; circle for all; find all
-        bad += testFind(400, 300, 10, 3, 2, 1);    // rect for all; circle for A,B; find A
-        bad += testFind(150, 450, 10, 3, 3, 1);    // rect for all; circle for all; find B
-        bad += testFind(250, 550, 10, 3, 3, 1);    // rect for all; circle for all; find C
-        bad += testFind(150, 450, 200, 3, 3, 2);    // rect for all; circle for all; find B, C
-        bad += testFind(140, 440, 10, 3, 2, 0);    // rect for all; circle for A,B; find none
-        bad += testFind(750, 550, 10, 2, 1, 0);    // rect for A,B; circle for A; find none
-        if (bad == 0) System.out.println("test 0 passed!");
+        bad += testFind(0, 0, 900, 3, 3, 3); // Rectangle for all; circle for all; find all.
+        bad += testFind(400, 300, 10, 3, 2, 1); // Rectangle for all; circle for A,B; find A.
+        bad += testFind(150, 450, 10, 3, 3, 1); // Rectangle for all; circle for all; find B.
+        bad += testFind(250, 550, 10, 3, 3, 1); // Rectangle for all; circle for all; find C.
+        bad += testFind(150, 450, 200, 3, 3, 2); // Rectangle for all; circle for all; find B, C.
+        bad += testFind(140, 440, 10, 3, 2, 0); // Rectangle for all; circle for A,B; find none.
+        bad += testFind(750, 550, 10, 2, 1, 0); // Rectangle for A,B; circle for A; find none.
+
+        if (bad == 0) System.out.println("Test 0 Passed!");
     }
 
     /**
-     * test tree 1 -- figure in handout
-     * hardcoded point locations for 800x600
+     * Test Tree 1 -> Figure in handout
+     * Hardcoded point locations for 800x600.
      */
     private void test1()
     {
         found = null;
-        tree = new PointQuadtree<Dot>(new Dot(300, 400), 0, 0, 800, 600); // start with A
+        tree = new PointQuadtree<Dot>(new Dot(300, 400), 0, 0, 800, 600); // Start with A
         tree.insert(new Dot(150, 450)); // B
         tree.insert(new Dot(250, 550)); // C
         tree.insert(new Dot(450, 200)); // D
@@ -175,13 +188,36 @@ public class DotTreeGUI extends DrawingGUI
         tree.insert(new Dot(490, 215)); // J
         tree.insert(new Dot(700, 550)); // K
         tree.insert(new Dot(310, 410)); // L
+
         int bad = 0;
-        bad += testFind(150, 450, 10, 6, 3, 1);    // rect for A [D] [E] [B [C]] [K]; circle for A, B, C; find B
-        bad += testFind(500, 125, 10, 8, 3, 1);    // rect for A [D [G F H]] [E] [B] [K]; circle for A, D, G; find G
-        bad += testFind(300, 400, 15, 10, 6, 2);    // rect for A [D [G F H]] [E] [B [C]] [K [L]]; circle for A,D,E,B,K,L; find A,L
-        bad += testFind(495, 225, 50, 10, 6, 3);    // rect for A [D [G F H [I [J]]]] [E] [B] [K]; circle for A,D,G,H,I,J; find H,I,J
-        bad += testFind(0, 0, 900, 12, 12, 12);    // rect for all; circle for all; find all
-        if (bad == 0) System.out.println("test 1 passed!");
+        bad += testFind(150, 450, 10, 6, 3, 1); // Rectangle for A [D] [E] [B [C]] [K]; circle for A, B, C; find B.
+        bad += testFind(500, 125, 10, 8, 3, 1); // Rectangle for A [D [G F H]] [E] [B] [K]; circle for A, D, G; find G.
+        bad += testFind(300, 400, 15, 10, 6, 2); // Rectangle for A [D [G F H]] [E] [B [C]] [K [L]]; circle for A,D,E,B,K,L; find A,L.
+        bad += testFind(495, 225, 50, 10, 6, 3); // Rectangle for A [D [G F H [I [J]]]] [E] [B] [K]; circle for A,D,G,H,I,J; find H,I,J
+        bad += testFind(0, 0, 900, 12, 12, 12); // Rectangle for all; circle for all; find all.
+
+        if (bad == 0) System.out.println("Test 1 Passed!");
+    }
+
+    private void test2()
+    {
+        found = null;
+        tree = new PointQuadtree<Dot>(new Dot(100, 500), 0, 0, width, height); // start with A
+        tree.insert(new Dot(300, 400)); // B
+        tree.insert(new Dot(400, 300)); // C
+        tree.insert(new Dot(600, 200)); // D
+        tree.insert(new Dot(700, 100)); // E
+
+        int bad = 0;
+        // Rectangle for all; circle for all; find all.
+        bad += testFind(400, 300, 900, 5, 5, 5);
+
+        // Other Test Cases
+        bad += testFind(650, 150, 100, 5, 5, 2);
+        bad += testFind(70, 500, 70, 3,2,1);
+        bad += testFind(250, 300, 50, 4,3,0);
+        bad += testFind(400, 200, 20, 5,4,0);
+        if (bad == 0) System.out.println("Test 2 Passed!");
     }
 
     /**
@@ -195,6 +231,9 @@ public class DotTreeGUI extends DrawingGUI
         else if (key == '+')
         {
             mouseRadius += 10;
+            System.out.println("Radius: " + mouseRadius);
+            System.out.println("X: " + mouseX);
+            System.out.println("Y: " + mouseY);
         }
 
         else if (key == '-')
@@ -218,7 +257,10 @@ public class DotTreeGUI extends DrawingGUI
             test1();
         }
 
-        // TODO: your test cases
+        else if (key == '2')
+        {
+            test2();
+        }
 
         repaint();
     }
