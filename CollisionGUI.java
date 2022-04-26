@@ -23,7 +23,7 @@ public class CollisionGUI extends DrawingGUI
 
     public CollisionGUI()
     {
-        super("Super-Collider", width, height);
+        super("Super Collider", width, height);
 
         blobs = new ArrayList<Blob>();
 
