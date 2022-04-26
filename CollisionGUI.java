@@ -96,6 +96,11 @@ public class CollisionGUI extends DrawingGUI
             System.out.println("Collision: " + k);
         }
 
+        else if (k == 't') // Using a keystroke for testing of collisions.
+        {
+            collisionDetectionTest();
+        }
+
         else // Set the type for new blobs.
         {
             blobType = k;
@@ -215,6 +220,46 @@ public class CollisionGUI extends DrawingGUI
 
         // Now update the drawing.
         repaint();
+    }
+
+    /**
+     * Method used to carefully test cases of things that should collide and things that should not.
+     */
+    public void collisionDetectionTest()
+    {
+        // Clearing all the blob objects currently on the screen.
+        blobs = new ArrayList<>();
+
+        // Setting the blobType to "Bouncer".
+        blobType = 'b';
+
+        // Creating new blob objects that are placed exactly far enough way such that there should be a collision.
+        Blob bouncer1 = new Bouncer(200, 100, width, height);
+        Blob bouncer2 = new Bouncer(400, 120, width, height);
+        bouncer1.setR(10);
+        bouncer2.setR(10);
+
+        // Setting the blobs on parallel paths of intersection.
+        bouncer1.setVelocity(5, 0);
+        bouncer2.setVelocity(-5, 0);
+
+        // Adding the blob objects to the array of blobs to be displayed in the GUI.
+        blobs.add(bouncer1);
+        blobs.add(bouncer2);
+
+        // Creating new blob objects that are placed far enough way such that there should NOT be a collision.
+        Blob bouncer3 = new Bouncer(200, 300, width, height);
+        Blob bouncer4 = new Bouncer(400, 330, width, height);
+        bouncer3.setR(10);
+        bouncer4.setR(10);
+
+        // Setting the blobs on parallel paths.
+        bouncer3.setVelocity(5, 0);
+        bouncer4.setVelocity(-5, 0);
+
+        // Adding the blob objects to the array of blobs to be displayed in the GUI.
+        blobs.add(bouncer3);
+        blobs.add(bouncer4);
     }
 
     public static void main(String[] args)
